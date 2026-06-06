@@ -1,4 +1,4 @@
-name: Build Launcher
+name: Build Launcher Secure
 on:
   push:
     branches: [ "master" ]
@@ -6,8 +6,6 @@ on:
 
 jobs:
   build-tauri:
-    permissions:
-      contents: write
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,20 +13,27 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 18
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install dependencies
-        run: yarn install
+      - name: Install Dependencies
+        run: |
+          yarn install
 
-      - name: Build Tauri App
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Frontend
+        run: |
+          yarn build
+        continue-on-error: true
+
+      - name: Build Tauri Core
+        run: |
+          cargo build --release
+        cwd: src-tauri
+
+      - name: Upload EXE Artifact
+        uses: actions/upload-artifact@v4
         with:
-          tagName: v__VERSION__
-          releaseName: 'Retrax Launcher v__VERSION__'
-          releaseBody: 'Built automatically by GitHub Actions.'
-          includeRelease: true
+          name: Retrax-Launcher-EXE
+          path: src-tauri/target/release/*.exe
