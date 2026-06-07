@@ -23,7 +23,7 @@ regex = "1"
 md-5 = "0.10.6"
 digest = "0.10"
 
-tauri = { version = "2.5.0", features = ["protocol-asset"] }
+tauri = { version = "2.5.0", features = [] }
 tauri-plugin-deep-link = "2"
 tauri-plugin-opener = "2"
 tauri-plugin-dialog = "2"
