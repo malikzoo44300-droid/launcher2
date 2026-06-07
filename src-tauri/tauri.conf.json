@@ -15,7 +15,8 @@
         "title": "Retrac",
         "width": 936,
         "height": 600,
-        "decorations": false
+        "resizable": true,
+        "fullscreen": false
       }
     ]
   },
