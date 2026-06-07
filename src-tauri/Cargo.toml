@@ -1,32 +1,42 @@
 [package]
 name = "retrac"
 version = "2.1.2"
+description = "The game launcher for Retrac, an OG Fortnite Experience."
+authors = ["ectrc"]
 edition = "2021"
 
 [lib]
 name = "retrac_launcher_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
 [dependencies]
+# Dépendances multi-plateformes
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sysinfo = "0.30.5"
 regex = "1"
 md-5 = "0.10.6"
 digest = "0.10"
-tauri = { version = "2.5.0", features = [] }
-tauri-plugin-deep-link = "2"
-tauri-plugin-opener = "2"
-tauri-plugin-dialog = "2"
 tokio = { version = "1.44.2", features = ["rt-multi-thread", "macros", "fs", "time", "net", "io-util"] } 
 reqwest = { version = "0.12.15", features = ["stream"] }
 async-compression = { version = "0.4.23", features = ["tokio", "gzip"] }
 futures-util = "0.3.31"
 tokio-util = "0.7.15"
 num_cpus = "1.16.0"
-tauri-plugin-process = "2"
+
+# Plugins Tauri v2 (alignés)
+tauri = { version = "2.5.0", features = [] }
+tauri-plugin-deep-link = "2.0.0"
+tauri-plugin-opener = "2.0.0"
+tauri-plugin-dialog = "2.0.0"
+tauri-plugin-process = "2.0.0"
+tauri-plugin-updater = "2.0.0"
 
 [target.'cfg(windows)'.dependencies]
+# Bibliothèques Windows isolées
 winapi = { version = "0.3", features = ["winbase", "processthreadsapi", "handleapi", "minwindef", "synchapi", "errhandlingapi", "shellapi", "securitybaseapi", "winuser"] }
 winver = "1.0.0"
 widestring = "1.0"
