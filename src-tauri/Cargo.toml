@@ -18,7 +18,6 @@ widestring = "1.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sysinfo = "0.30.5"
-winver = "1.0.0"
 regex = "1"
 md-5 = "0.10.6"
 digest = "0.10"
@@ -40,3 +39,6 @@ tauri-plugin-single-instance = { version = "2.0.0", features = ["deep-link"] }
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-updater = "2"
+
+[target.'cfg(windows)'.dependencies]
+winver = "1.0.0"

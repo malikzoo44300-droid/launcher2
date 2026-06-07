@@ -78,3 +78,6 @@ pub fn add_windows_defender_exclusions(folder_path: &str) -> Result<bool, String
 
   Ok(true)
 }
+
+#[cfg(windows)] // <--- Ajoute cette ligne avant ton code Windows
+use winapi::um::shellapi::ShellExecuteW;
