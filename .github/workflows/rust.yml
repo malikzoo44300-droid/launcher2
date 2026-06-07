@@ -1,4 +1,4 @@
-name: Build MSI Installer
+name: Build App
 
 on:
   push:
@@ -28,14 +28,14 @@ jobs:
       - name: Build Frontend
         run: yarn run build
 
-      - name: Build Tauri MSI
+      - name: Build Tauri
         env:
           TAURI_SIGNING_PRIVATE_KEY: ""
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
         run: yarn tauri build
 
-      - name: Upload MSI Artifact
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Retrac-Installer
-          path: src-tauri/target/release/bundle/msi/*.msi
+          name: Retrac-App
+          path: src-tauri/target/release/
