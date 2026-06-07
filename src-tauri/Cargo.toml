@@ -13,15 +13,13 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-winapi = { version = "0.3", features = ["winbase", "processthreadsapi", "handleapi", "minwindef", "synchapi", "errhandlingapi", "shellapi", "securitybaseapi"] }
-widestring = "1.0"
+# Garde ici uniquement les dépendances multi-plateformes
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sysinfo = "0.30.5"
 regex = "1"
 md-5 = "0.10.6"
 digest = "0.10"
-
 tauri = { version = "2.5.0", features = [] }
 tauri-plugin-deep-link = "2"
 tauri-plugin-opener = "2"
@@ -33,12 +31,15 @@ futures-util = "0.3.31"
 tokio-util = "0.7.15"
 num_cpus = "1.16.0"
 tauri-plugin-process = "2"
+widestring = "1.0"
 
-[target."cfg(any(target_os = \"macos\", windows, target_os = \"linux\"))".dependencies]
+[target.'cfg(windows)'.dependencies]
+# Toutes tes dépendances Windows vont ici !
+winapi = { version = "0.3", features = ["winbase", "processthreadsapi", "handleapi", "minwindef", "synchapi", "errhandlingapi", "shellapi", "securitybaseapi"] }
+winver = "1.0.0"
+
+[target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
 tauri-plugin-single-instance = { version = "2.0.0", features = ["deep-link"] }
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-updater = "2"
-
-[target.'cfg(windows)'.dependencies]
-winver = "1.0.0"
