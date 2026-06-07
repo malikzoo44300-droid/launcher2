@@ -26,6 +26,8 @@ jobs:
         run: npm run build
 
       - name: Build Tauri App
+        env:
+          TAURI_PRIVATE_KEY: ""
         run: npm run tauri build
 
       - name: Upload EXE Artifact
