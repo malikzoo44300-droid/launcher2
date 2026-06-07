@@ -1,4 +1,5 @@
 name: Build Launcher Secure
+
 on:
   push:
     branches: [ "master" ]
@@ -23,14 +24,12 @@ jobs:
 
       - name: Build Frontend Interface
         run: npm run build
-        continue-on-error: true
 
-      - name: Build Tauri Core
-        run: cargo build --release
-        working-directory: src-tauri
+      - name: Build Tauri App
+        run: npm run tauri build
 
       - name: Upload EXE Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Retrax-Launcher-EXE
-          path: src-tauri/target/release/*.exe
+          name: Retrac-Launcher-V2
+          path: src-tauri/target/release/bundle/msi/*.msi
