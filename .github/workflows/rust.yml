@@ -28,10 +28,10 @@ jobs:
       - name: Build Tauri App
         env:
           TAURI_PRIVATE_KEY: ""
-        run: npm run tauri build
+        run: npm run tauri build -- --debug
 
       - name: Upload EXE Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Retrac-Launcher-V2
-          path: src-tauri/target/release/bundle/msi/*.msi
+          name: Retrac-Launcher-EXE-Final
+          path: src-tauri/target/debug/*.exe
