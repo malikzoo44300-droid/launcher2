@@ -23,7 +23,7 @@ pub fn kill_all(process_names: &[&str]) -> Result<(), String> {
     let mut system = System::new_all();
     system.refresh_all();
 
-    for (pid, process) in system.processes() {
+    for (_pid, process) in system.processes() {
         for &target_name in process_names {
             if process.name().eq_ignore_ascii_case(target_name) {
                 let result = process.kill_with(Signal::Kill);
@@ -46,7 +46,7 @@ pub fn is_process_running(exe_name: &str) -> bool {
     })
 }
 
-// --- Fonctions Windows (avec versions Fallback) ---
+// --- Fonctions Windows (avec versions Fallback pour Linux) ---
 
 #[cfg(windows)]
 fn start_internal(process_path: PathBuf, suspended: bool, args: Option<String>) -> Result<(), String> {
@@ -89,7 +89,27 @@ pub fn start_suspended_with_args(path: PathBuf, args: Vec<&str>) -> Result<(), S
 pub fn launch_eac_setup(path: &PathBuf, arg: &str) -> Result<(), String> {
     let eac_path = path.join("EasyAntiCheat\\EasyAntiCheat_EOS_Setup.exe");
     if !eac_path.exists() { return Err("EAC path not found".into()); }
-    // ... (insère ici le reste de ta logique CreateProcessW pour EAC comme dans ton code original)
+    
+    let eac_folder = eac_path.parent().unwrap_or(path);
+    let eac_folder_wide = U16CString::from_str(eac_folder.to_str().unwrap_or("")).map_err(|e| e.to_string())?;
+    let eac_path_str = eac_path.to_str().ok_or("Invalid path")?;
+    
+    let application_name = U16CString::from_str(eac_path_str).map_err(|e| e.to_string())?;
+    let cmd_line_wide = U16CString::from_str(&format!("\"{}\" install {}", eac_path_str, arg)).map_err(|e| e.to_string())?;
+
+    let mut startup_info: STARTUPINFOW = unsafe { std::mem::zeroed() };
+    startup_info.cb = std::mem::size_of::<STARTUPINFOW>() as u32;
+    let mut process_info: PROCESS_INFORMATION = unsafe { std::mem::zeroed() };
+
+    let success = unsafe {
+        CreateProcessW(
+            application_name.into_raw() as *mut u16, cmd_line_wide.into_raw() as *mut u16, null_mut(), null_mut(), 0,
+            DETACHED_PROCESS, null_mut(), eac_folder_wide.into_raw() as *const u16, &mut startup_info, &mut process_info,
+        )
+    };
+
+    if success == 0 { return Err(format!("EAC setup failed: {}", unsafe { winapi::um::errhandlingapi::GetLastError() })); }
+    unsafe { CloseHandle(process_info.hProcess); CloseHandle(process_info.hThread); }
     Ok(())
 }
 

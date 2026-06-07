@@ -1,19 +1,13 @@
 [package]
 name = "retrac"
 version = "2.1.2"
-description = "The game launcher for Retrac, an OG Fortnite Experience."
-authors = ["ectrc"]
 edition = "2021"
 
 [lib]
 name = "retrac_launcher_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
-[build-dependencies]
-tauri-build = { version = "2", features = [] }
-
 [dependencies]
-# Garde ici uniquement les dépendances multi-plateformes
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sysinfo = "0.30.5"
@@ -26,20 +20,13 @@ tauri-plugin-opener = "2"
 tauri-plugin-dialog = "2"
 tokio = { version = "1.44.2", features = ["rt-multi-thread", "macros", "fs", "time", "net", "io-util"] } 
 reqwest = { version = "0.12.15", features = ["stream"] }
-async-compression =  { version = "0.4.23", features = ["tokio", "gzip"] }
+async-compression = { version = "0.4.23", features = ["tokio", "gzip"] }
 futures-util = "0.3.31"
 tokio-util = "0.7.15"
 num_cpus = "1.16.0"
 tauri-plugin-process = "2"
-widestring = "1.0"
 
 [target.'cfg(windows)'.dependencies]
-# Toutes tes dépendances Windows vont ici !
-winapi = { version = "0.3", features = ["winbase", "processthreadsapi", "handleapi", "minwindef", "synchapi", "errhandlingapi", "shellapi", "securitybaseapi"] }
+winapi = { version = "0.3", features = ["winbase", "processthreadsapi", "handleapi", "minwindef", "synchapi", "errhandlingapi", "shellapi", "securitybaseapi", "winuser"] }
 winver = "1.0.0"
-
-[target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
-tauri-plugin-single-instance = { version = "2.0.0", features = ["deep-link"] }
-
-[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
-tauri-plugin-updater = "2"
+widestring = "1.0"
