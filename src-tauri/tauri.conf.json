@@ -41,7 +41,10 @@
   "bundle": {
     "active": true,
     "createUpdaterArtifacts": false,
-    "targets": "all",
+    "targets": ["msi"],
+    "windows": {
+      "installMode": "currentUser"
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
