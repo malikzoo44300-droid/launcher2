@@ -21,6 +21,10 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Build Frontend Interface
+        run: npm run build
+        continue-on-error: true
+
       - name: Build Tauri Core
         run: cargo build --release
         working-directory: src-tauri
