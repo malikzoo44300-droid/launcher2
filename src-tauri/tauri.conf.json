@@ -1,69 +1,34 @@
 {
-  "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Retrac",
-  "version": "2.1.2",
-  "identifier": "launcher.retrac.site",
   "build": {
-    "frontendDist": "../dist",
-    "devUrl": "http://localhost:1420",
-    "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "distDir": "../dist",
+    "devPath": "../dist"
   },
-  "app": {
-    "windows": [
-      {
-        "title": "Retrac",
-        "width": 936,
-        "height": 600,
-        "minWidth": 530,
-        "maxWidth": 1200,
-        "maxHeight": 800,
-        "theme": "Dark",
-        "windowClassname": "Retrac",
-        "backgroundColor": "#2e2e2e",
-        "decorations": false,
-        "shadow": true,
-        "maximizable": false,
-        "focus": true
-      }
-    ],
-    "security": {
-      "csp": null,
-      "assetProtocol": {
-        "enable": true,
-        "scope": {
-          "requireLiteralLeadingDot": false,
-          "allow": ["**/**"]
-        }
-      }
-    }
+  "package": {
+    "productName": "Retrax-Launcher",
+    "version": "0.1.0"
   },
-  "bundle": {
-    "active": true,
-    "createUpdaterArtifacts": true,
-    "targets": "msi",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
-  },
-  "plugins": {
-    "deep-link": {
-      "desktop": {
-        "schemes": ["retrac"]
-      }
+  "tauri": {
+    "allowlist": {
+      "all": true
     },
-    "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDJGNDQ2QkQxNjc3NDIwODgKUldTSUlIUm4wV3RFTDNYNkRWQ2hZSlBxWktrRW5HUW82S2M1WFdxcFEwUXJhdjZlVy9VRldaM2IK",
-      "endpoints": [
-        "https://retrac.site/retrac/query_tauri_update/{{current_version}}"
-      ],
-      "windows": {
-        "installMode": "passive"
-      }
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "com.retrax.launcher",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ]
+    },
+    "window": {
+      "fullscreen": false,
+      "resizable": true,
+      "title": "Retrax-Launcher",
+      "width": 800,
+      "height": 600
     }
   }
 }
